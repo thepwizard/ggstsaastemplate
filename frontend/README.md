@@ -20,6 +20,34 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
+## Build teh docker image More
+```bash
+docker build -t ggtsaastemplate .
+docker run -p 3000:3000 ggstsaastemplate
+You can now see container running in Docker Desktop and you should be able to 
+aceess the app on http://localhost:3000
+docker images (this command showcase the images in your local desktop)
+```
+
+## Push your image to docker hub 
+```bash
+docker login (this would login to docker hub where our docker image will be stored)
+docker tag 691a586093be ratewar/ggtsaastemplate (you can replace this with your imagecode by running docker images and your user/name for docker hub)
+docker push ratewar/ggtsaastemplate
+```
+
+## Deploying on kubernetes 
+```bash
+change the image path in deployment.yml in k82 folder
+containers:
+  - name: ggtsaastemplate
+    image: ratewar/ggtsaastemplate:latest (replace this with your user and imagename)
+kubectl apply -f ./deployment.yml 
+kubectl apply -f ./service.yml 
+You should now be able to access website on http://localhost:30000 (not 3000)
+Go to docker desktop and you can see your two pods 
+```
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
