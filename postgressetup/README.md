@@ -24,3 +24,9 @@ kubectl get pods -l app=postgres
 kubectl scale deployment --replicas=5 postgres
 kubectl get pods -l app=postgres
 ```
+
+## To get base64 secret for secret deployment file
+```bash
+echo -n 'postgres://user:password@postgres:5432/mydb' | base64
+echo 'sffdf' | base64 --decode
+```
