@@ -42,12 +42,70 @@ change the image path in deployment.yml in k82 folder
 containers:
   - name: ggtsaastemplate
     image: ratewar/ggtsaastemplate:latest (replace this with your user and imagename)
-kubectl apply -f ./deployment.yml 
-kubectl apply -f ./service.yml 
+kubectl apply -f ./db-credentials.yaml
+kubectl apply -f ./db-migrate-job.yaml
+
+Wait for this to finish before next steps
+
+kubectl apply -f ./deployment.yaml 
+kubectl apply -f ./service.yaml 
 You should now be able to access website on http://localhost:30000 (not 3000)
 Go to docker desktop and you can see your two pods 
 ```
 
+## How To Check Logs 
+
+```bash
+
+~/Downloads/ggtsaastemplate/frontend/k8s $>kubectl get jobs
+NAME             STATUS   COMPLETIONS   DURATION   AGE
+db-migrate-job   Failed   0/1           2m5s       2m5s
+
+~/Downloads/ggtsaastemplate/frontend/k8s $>kubectl delete jobs db-migrate-job
+job.batch "db-migrate-job" deleted
+
+~/Downloads/ggtsaastemplate/frontend/k8s $>kubectl get secret db-credentials -o yaml
+
+~/Downloads/ggtsaastemplate/frontend/k8s $>kubectl logs job/db-migrate-job
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "prisma_db", schema "public" at "postgres:5432"
+
+3 migrations found in prisma/migrations
+
+Applying migration `20240224122304_initialsetup`
+Applying migration `20240824135447_addeduser`
+Applying migration `20240824135938_addedposts`
+
+The following migration(s) have been applied:
+
+migrations/
+  └─ 20240224122304_initialsetup/
+    └─ migration.sql
+  └─ 20240824135447_addeduser/
+    └─ migration.sql
+  └─ 20240824135938_addedposts/
+    └─ migration.sql
+      
+All migrations have been successfully applied.
+
+~/Downloads/ggtsaastemplate/frontend/k8s $>kubectl exec -it postgres-7d554995f8-xfpgb -- /bin/sh
+# psql -U prisma_user -d prisma_db
+psql (16.4 (Debian 16.4-1.pgdg120+1))
+Type "help" for help.
+
+prisma_db=# \dt
+                 List of relations
+ Schema |        Name        | Type  |    Owner    
+--------+--------------------+-------+-------------
+ public | Post               | table | prisma_user
+ public | ProductLaunch      | table | prisma_user
+ public | _prisma_migrations | table | prisma_user
+ public | users              | table | prisma_user
+(4 rows)
+
+prisma_db=# \q
+# exit
+```
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
